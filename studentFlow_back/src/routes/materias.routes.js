@@ -7,7 +7,8 @@ import {
   replaceMateria,
   updateMateria,
   deleteMateria,
-  getTareasByMateria
+  getTareasByMateria,
+  getEventosByMateria
 } from "../controllers/materias.controller.js";
 
 const router = Router();
@@ -25,6 +26,9 @@ router.get("/:id", getMateriaById);
 
 // Obtener las tareas vinculadas a una materia específica
 router.get("/:id/tareas", getTareasByMateria);
+
+// Obtener los eventos vinculados a una materia específica
+router.get("/:id/eventos", getEventosByMateria);
 
 // Crear una nueva materia
 router.post("/", createMateria);

@@ -1,6 +1,6 @@
 import * as materiasService from "../services/materias.service.js";
 import { sendNoContent, sendSuccess } from "../utils/api-response.js";
-
+import { findEventosByMateriaAndUserId } from "../repositories/materias.repositorio.js";
 import {
   validateCreateMateria,
   validateMateriaListQuery,
@@ -117,6 +117,24 @@ export async function getTareasByMateria(request, response, next) {
     const id = validateMateriaId(request.params.id);
     const tareas = await materiasService.getTareasByMateriaId(id, request.user.id);
     return sendSuccess(response, tareas);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Controlador para obtener la lista de eventos de una materia.
+ * @param {Object} request - Petición Express con req.params.id.
+ * @param {Object} response - Respuesta con la lista de eventos.
+ * @param {Function} next - Middleware para retransmitir errores.
+ */
+export async function getEventosByMateria(request, response, next) {
+  try {
+    const id = validateMateriaId(request.params.id);
+    const userId = request.user?.id || 1;
+
+    const eventos = await findEventosByMateriaAndUserId(id, userId);
+    return sendSuccess(response, eventos);
   } catch (error) {
     return next(error);
   }

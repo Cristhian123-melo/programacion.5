@@ -40,7 +40,7 @@ function mapMateria(row) {
     codigo: row.codigo,
     creditos: row.creditos,
     color: row.color,
-    activa: row.activa,
+    activa: Boolean(row.activa),
     createdAt: row.createdAt,
     updatedAt: row.updatedAt
   };
@@ -80,8 +80,11 @@ export async function findAllByUserId(userId, filters = {}) {
   );
 
   const orderBy = normalizeSort(filters.sort, filters.order);
-  const limit = filters.limit;
-  const offset = (filters.page - 1) * limit;
+
+  // Asegurar que limit y page sean enteros válidos
+  const limit = Math.max(1, parseInt(filters.limit, 10) || 10);
+  const page = Math.max(1, parseInt(filters.page, 10) || 1);
+  const offset = (page - 1) * limit;
 
   const [rows] = await pool.execute(
     `SELECT
@@ -314,6 +317,34 @@ export async function findTareasByMateriaIdAndUserId(materiaId, userId) {
      FROM tarea t
      WHERE t.id_materia = ? AND t.id_usuario = ?`,
     [materiaId, userId]
+  );
+
+  return rows;
+}
+
+/**
+ * Obtiene los eventos asociados a una materia y a un usuario específico.
+ * @param {number|string} id - Identificador de la materia.
+ * @param {number|string} userId - Identificador del usuario propietario.
+ * @returns {Promise<Array<Object>>} Listado de eventos de la materia.
+ */
+export async function findEventosByMateriaAndUserId(id, userId) {
+  const [rows] = await pool.execute(
+    `SELECT
+       e.id_evento AS id,
+       e.id_materia AS materiaId,
+       e.titulo,
+       e.descripcion,
+       e.fecha,
+       e.hora_inicio AS horaInicio,
+       e.hora_fin AS horaFin,
+       e.tipo,
+       e.created_at AS createdAt,
+       e.updated_at AS updatedAt
+     FROM evento e
+     INNER JOIN materia m ON m.id_materia = e.id_materia
+     WHERE m.id_materia = ? AND m.id_usuario = ?`,
+    [id, userId]
   );
 
   return rows;
