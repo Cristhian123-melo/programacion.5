@@ -16,3 +16,5 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 export default app;
+import recordatoriosRouter from "./routes/recordatorios.routes.js";
+app.use("/api/v1/recordatorios", recordatoriosRouter);
